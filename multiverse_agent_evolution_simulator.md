@@ -20,13 +20,15 @@
 - **환경 상수 Variation (Environmental Variance)**: 각 우주의 물리/사회적 상수를 결정론적·확률론적 파라미터로 주입하여 성장 조건 제어
 
 ## 3. Architecture & Key Concepts (시스템 구조)
-```
-[Base Agent Template]
-        │ (Branching)
-        ├──► [Universe 01] ──► Agent 01 (Divergence / Null)
-        ├──► [Universe 02] ──► Agent 02 (Divergence / Null)
-        │        ...
-        └──► [Universe N ] ──► Agent N (Divergence / Null)
+```mermaid
+graph TD
+    A["Base Agent Template"] -->|Branching| U1["Universe 01"]
+    A -->|Branching| U2["Universe 02"]
+    A -->|Branching| Ux["..."]
+    A -->|Branching| UN["Universe N"]
+    U1 --> AG1["Agent 01<br/>(Divergence / Null)"]
+    U2 --> AG2["Agent 02<br/>(Divergence / Null)"]
+    UN --> AGN["Agent N<br/>(Divergence / Null)"]
 ```
 - **Universe Context**: 물리 법칙, 생존 난이도, 부모 유전자 결합 확률, 사회적 이벤트 빈도 등을 보유한 독립적 시스템
 - **Agent State Engine**: 유전적 기본값(Base DNA), 성격 지표(Persona Matrices), 지능, 경험치, 생존 여부(IsAlive)를 관리하는 개체 객체
@@ -43,12 +45,12 @@
 - **성장 단계 (Growth Loop)**: 매 시간 단위(Tick)마다 지정된 이벤트 매트릭스 실행 — 사회적 자극, 물리적 환경 변화, 무작위 사고 발생 → 에이전트의 내부 성격 파라미터(예: 외향성, 안정성, 위험 선호도) 재계산
 
 ### Phase 3: Trajectory & State Divergence Tracking
-- T_end 시점까지 생존한 에이전트들의 최종 스탯 및 성장 이력 수집
+- $T_{\text{end}}$ 시점까지 생존한 에이전트들의 최종 스탯 및 성장 이력 수집
 - 코사인 유사도(Cosine Similarity) 및 거리 계산 알고리즘을 통한 원본 `Agent_Base`와의 격차 산출
 
 ## 5. Metrics & Analytics (분석 지표)
-- **Existential Rate (R_exist)**: 전체 N개 우주 중 에이전트가 최종까지 존재 및 생존한 비율
-- **Identity Similarity Index (S_identity)**: 기준 우주의 에이전트와 비교했을 때 최종 상태(성격, 능력치)의 유효 일치율
+- **Existential Rate ($R_{\text{exist}}$)**: 전체 N개 우주 중 에이전트가 최종까지 존재 및 생존한 비율
+- **Identity Similarity Index ($S_{\text{identity}}$)**: 기준 우주의 에이전트와 비교했을 때 최종 상태(성격, 능력치)의 유효 일치율
 - **Divergence Spectrum**: 에이전트 성장 궤적이 분기된 형태의 클러스터링 결과
 
 ## 6. Mathematical & System Logic for 'Infinity' (무한의 로직 및 알고리즘 구현)
@@ -56,43 +58,35 @@
 
 ### 6.1. Infinite Representation Logic (무한 공간 표현)
 **Lazy Evaluation & Procedural Generation (절차적 우주 생성)**
-- 모든 우주를 동시에 메모리에 로드하지 않고, $2^{64}$ 이상 공간을 가지는 64-bit PRNG Seed(예: PCG64 / Xoshiro256++)를 매핑
-- 우주 U_k의 물리 법칙, 환경 변수, 사건 발생 분포는 모두 `Seed(k)`로부터 필요 시점에 동적으로 생성(Determined-on-demand)되므로 O(1)의 메모리 공간으로 무한에 가까운 공간을 표현
+- 모든 우주를 동시에 메모리에 로드하지 않고, 2^64 이상 공간을 가지는 64-bit PRNG Seed(예: PCG64 / Xoshiro256++)를 매핑
+- 우주 $U_k$의 물리 법칙, 환경 변수, 사건 발생 분포는 모두 `Seed(k)`로부터 필요 시점에 동적으로 생성(Determined-on-demand)되므로 O(1)의 메모리 공간으로 무한에 가까운 공간을 표현
 
 **Monte Carlo Convergence Engine (통계적 수렴 제어)**
 - 고정된 N번의 반복 대신, 탐색된 우주들에서 '나와 100% 동일한 개체가 발견될 확률' 및 '성격 분기 스펙트럼의 신뢰구간'을 실시간 추적
 - 아래 표준오차 SE 조건이 충족될 때까지 백그라운드 루프가 무한히 우주를 탐색·수집:
 
-```
-SE = sqrt( p(1-p) / n ) < ε
-```
+$$SE = \sqrt{\frac{p(1-p)}{n}} < \epsilon$$
+
 (p: 관측된 비율, n: 탐색한 우주 수, ε: 목표 오차 한계)
 
 ## 7. Execution Architecture: Sequential vs Parallel (실행 및 동시성 구조)
 시스템 자원 효율을 최대화하고 무한 확장성을 보장하기 위해 Hybrid Stream & Pool Architecture를 적용합니다.
 
-```
-[Seed Generator (Infinite Stream)]
-        │
-        ▼
-[Worker Thread / Process Pool] ──► (Parallel Execution: Universe K ~ K+N)
-        │
-   [Event & Tick Loop]
-        │
-   ┌────┴────┐
-   ▼         ▼
-[Null/Dead Agent]   [Completed Cycle]
-(Early Pruning)            │
-(Memory Release)           ▼
-   │                [Metrics Collector]
-   └──────────┬─────────────┘
-              ▼
-   [Queue Next Seed (Continuous Loop)]
+```mermaid
+flowchart TD
+    SG["Seed Generator<br/>(Infinite Stream)"] --> WP["Worker Thread / Process Pool<br/>(Parallel Execution: Universe K ~ K+N)"]
+    WP --> ETL["Event & Tick Loop"]
+    ETL --> ND["Null/Dead Agent<br/>(Early Pruning, Memory Release)"]
+    ETL --> CC["Completed Cycle"]
+    CC --> MC["Metrics Collector"]
+    ND --> QNS["Queue Next Seed<br/>(Continuous Loop)"]
+    MC --> QNS
+    QNS --> WP
 ```
 
 ### 7.1. Execution Pipeline Options
 **Parallel Execution Phase (동시 병렬 실행 - 인프라 임계치 제한)**
-- 적용 시점: 특정 기점 T_0에서 양자 분기(Branching)가 일어나는 직후 N개 우주
+- 적용 시점: 특정 기점 $T_0$에서 양자 분기(Branching)가 일어나는 직후 N개 우주
 - 구현: Thread Pool / Process Pool을 통한 CPU 코어 단위 Parallelism
 - N개의 우주가 독립된 Context로 병렬 진화하며, 우주 간 공유 자원 잠금(Locking)을 최소화하기 위해 메시지 파싱(Lock-free Queue) 방식 적용
 
@@ -105,19 +99,16 @@ SE = sqrt( p(1-p) / n ) < ε
 
 ## 8. Data Model & State Machine (상태 머신 및 데이터 구조)
 ### 8.1. Agent State Matrix
-```
-A_state(t) = (DNA_base, P(t), Status)
+$$A_{\text{state}}(t) = (\text{DNA}_{\text{base}}, P(t), \text{Status})$$
 
-P(t) = [P_extroversion, P_neuroticism, P_risk-tolerance, ...]^T   (동적 변형 성격 매트릭스)
+$$P(t) = [P_{\text{extroversion}}, P_{\text{neuroticism}}, P_{\text{risk-tolerance}}, \dots]^T \quad \text{(동적 변형 성격 매트릭스)}$$
 
-Status ∈ { NOT-BORN, ALIVE, TERMINATED }
-```
+$$\text{Status} \in \{ \text{NOT-BORN}, \text{ALIVE}, \text{TERMINATED} \}$$
 
 ### 8.2. State Transition Function
-```
-A_state(t + Δt) = f( A_state(t), E_universe(t, Seed_k) )
-```
-E_universe: 해당 우주의 환경 변수 및 무작위 자극 이벤트 벡터
+$$A_{\text{state}}(t + \Delta t) = f\left( A_{\text{state}}(t), E_{\text{universe}}(t, \text{Seed}_k) \right)$$
+
+$E_{\text{universe}}$: 해당 우주의 환경 변수 및 무작위 자극 이벤트 벡터
 
 ## 9. 기술 스택 (Tech Stack)
 1단계 프로토타입은 **Python + NumPy/Numba(연산) + Plotly(분기 트리·클러스터링 시각화)**로 빠르게 구조를 검증합니다. 구조가 자리잡고 N을 키울 필요가 생기면, O(1) 메모리 무한 스트리밍 구조의 이점을 제대로 살리기 위해 **C++ (또는 Rust) + 스레드 풀**로 코어 시뮬레이션 루프만 이식합니다 — dvd의 C++ 시스템 프로그래밍 경험과도 맞는 방향입니다. 시각화·분석 레이어는 Python에 남겨 개발 속도를 유지합니다.
