@@ -1,0 +1,48 @@
+{
+  "good": [
+    {
+      "name": "학업_성취",
+      "category": "good",
+      "weight": 3,
+      "persona_effects": { "O": 0.15, "C": 0.1 },
+      "vitality_damage": { "min": 0, "max": 0 }
+    },
+    {
+      "name": "새로운_인연",
+      "category": "good",
+      "weight": 3,
+      "persona_effects": { "E": 0.15, "A": 0.1 },
+      "vitality_damage": { "min": 0, "max": 0 }
+    },
+    {
+      "name": "여행_경험",
+      "category": "good",
+      "weight": 2,
+      "persona_effects": { "O": 0.2 },
+      "vitality_damage": { "min": 0, "max": 0 }
+    }
+  ],
+  "bad": [
+    {
+      "name": "교통사고",
+      "category": "bad",
+      "weight": 2,
+      "persona_effects": { "N": 0.3, "E": -0.2 },
+      "vitality_damage": { "min": 10, "max": 90 }
+    },
+    {
+      "name": "실직",
+      "category": "bad",
+      "weight": 3,
+      "persona_effects": { "N": 0.2, "C": -0.1 },
+      "vitality_damage": { "min": 5, "max": 30 }
+    },
+    {
+      "name": "인간관계_단절",
+      "category": "bad",
+      "weight": 3,
+      "persona_effects": { "N": 0.15, "A": -0.2, "E": -0.15 },
+      "vitality_damage": { "min": 0, "max": 15 }
+    }
+  ]
+}
